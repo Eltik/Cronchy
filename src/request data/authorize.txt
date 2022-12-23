@@ -1,0 +1,18 @@
+GET /authorize?client_id=noaihdevm_6iyg0a8l0q&redirect_uri=https%3A%2F%2Fbeta.crunchyroll.com%2Fcallback&response_type=cookie&state=%2F HTTP/2
+Host: sso.crunchyroll.com
+Cookie: __cf_bm=cwwvIpfvIwvYOznZ0Dvn76O6MxNd8AlARBHC2a4j9T4-1671724610-0-AW3VzDzwmgy1i1LC4lBL205wodKcLyD5OFUTC3Qr45LfxhbntxPGbhwW5+xR+duLBzDFrjyPxwNzVs0tnDNISlvfpNyQhG9fkB7sFo6iPyRK; __cfruid=4d9187729453310a08bffa0ebbb461289d986f12-1671724610; ajs_anonymous_id=%22e5df3d6f-1c4b-4bc9-9d88-764debda845e%22; _gcl_au=1.1.385610668.1671724621; _tt_enable_cookie=1; _ttp=Q3Mlhc5E0hk7IWOa9s8uELqGMUx; etp_rt=7ab22e01-2c55-4ec7-aa21-a1417a74fb46
+Cache-Control: max-age=0
+Upgrade-Insecure-Requests: 1
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.5359.95 Safari/537.36
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: navigate
+Sec-Fetch-User: ?1
+Sec-Fetch-Dest: document
+Sec-Ch-Ua: "Not?A_Brand";v="8", "Chromium";v="108"
+Sec-Ch-Ua-Mobile: ?0
+Sec-Ch-Ua-Platform: "macOS"
+Referer: https://sso.crunchyroll.com/login?authid=FzdImf3JRoNdj9oXRkCidytD77dxIQSUhR6f8Mj-
+Accept-Encoding: gzip, deflate
+Accept-Language: en-US,en;q=0.9
+
