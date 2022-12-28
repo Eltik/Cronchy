@@ -2,7 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const axios_1 = require("axios");
 class Cronchy {
-    // For the token, it might change. You can pass it in if it has changed.
+    /**
+     * @param email The email of the account.
+     * @param password Password of the account.
+     * @param token Optional token. If it has changed, you can pass it in.
+     */
     constructor(email, password, token) {
         // Constant, might need to be changed.
         this.token = "a3ZvcGlzdXZ6Yy0teG96Y21kMXk6R21JSTExenVPVnRnTjdlSWZrSlpibzVuLTRHTlZ0cU8=";
@@ -11,14 +15,6 @@ class Cronchy {
         this.token = token ? token : "a3ZvcGlzdXZ6Yy0teG96Y21kMXk6R21JSTExenVPVnRnTjdlSWZrSlpibzVuLTRHTlZ0cU8=";
         this.main = "https://www.crunchyroll.com";
         this.api = "https://beta-api.crunchyroll.com";
-        this.login = this.login.bind(this);
-        this.queryGenreData = this.queryGenreData.bind(this);
-        this.queryShowData = this.queryShowData.bind(this);
-        this.queryRatings = this.queryRatings.bind(this);
-        this.queryRecommendations = this.queryRecommendations.bind(this);
-        this.querySeason = this.querySeason.bind(this);
-        this.queryEpisodes = this.queryEpisodes.bind(this);
-        this.getEpisodes = this.getEpisodes.bind(this);
     }
     /**
      * @important Must be run before any other function.

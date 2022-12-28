@@ -1,5 +1,5 @@
 # Cronchy
-Crunchyroll wrapper using webscraping utilities. Made using Crunchyroll's beta API. Created by [Eltik]("https://github.com/Eltik"), [Inumaki]("https://github.com/5H4D0WILA"), and the [Consumet Community]("https://discord.gg/consumet").
+Crunchyroll wrapper using webscraping utilities. Made using Crunchyroll's beta API. Created by [Eltik](https://github.com/Eltik), [Inumaki](https://github.com/5H4D0WILA), and the [Consumet Community](https://discord.gg/consumet).
 
 ## Installation
 Cronchy is available on NPM via the following command:
@@ -16,7 +16,7 @@ It is also important to note that Cronchy requires TypeScript and NodeJS to run,
 ## Basic Documentation
 ### Constructor
 Cronchy requires a <b>premium account</b> to work properly (and no, we will/cannot support non-premium accounts). To initialize a Cronchy "instance", pass your email and password into the constructor.
-```typescript
+```javascript
 // ES6
 import Cronchy from "cronchy";
 // commonjs
@@ -25,7 +25,7 @@ const Cronchy = require("cronchy").default;
 const instance = new Cronchy("myemail@outlook.com", "password123");
 ```
 There is a third argument you can pass into the constructor which is the token. As of now, Crunchyroll requires a token header for all requests that is constant. The token should work for all accounts, but in the case it doesn't, you can provide a it into the constructor in the case Crunchyroll changes how their API works. Support will not be provided on how to fetch the token, but for peace of mind the argument is there just in case.
-```typescript
+```javascript
 ...
 const instance = new Cronchy("myemail@outlook.com", "password123", "a3ZvcGlzdXZ6Yy0teG96Y21kMXk6R21JSTExenVPVnRnTjdlSWZrSlpibzVuLTRHTlZ0cU8=");
 ```
@@ -51,7 +51,7 @@ interface AccountData {
 }
 ```
 For convenience sake, the `login()` function will store all account data in the instance object. This means that if you are running a web server, upon the server's startup you can run the `login()` function to prevent having to continuously fetch the `access_token`. For example:
-```typescript
+```javascript
 import Fastify from "fastify";
 import Cronchy from "cronchy";
 
@@ -138,7 +138,27 @@ const instance = new Cronchy(...);
 await instance.getSources("G6Q4Q3V1R", "en-US");
 
 interface Sources {
-    // NOT COMPLETE
+    sources: Array<Source>;
+    subtitles: Array<Subtitle>;
+}
+
+interface Source {
+    url: string;
+    quality: string;
+    isM3U8: boolean;
+}
+
+interface Subtitle {
+    url: string;
+    lang: string;
+    format: string;
 }
 ```
 Contribution to this documentation would be appreciated as it is not finished.
+
+### TODO
+- MalSync
+- Cleanup (the whole thing is sort of messy)
+If anyone wishes to contribute, that would be appreciated. Feel free to create a Pull Request.
+
+<i>Rip Kamyroll</i>

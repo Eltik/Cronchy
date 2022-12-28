@@ -18,7 +18,11 @@ class Cronchy {
     private main:string;
     private api:string;
 
-    // For the token, it might change. You can pass it in if it has changed.
+    /**
+     * @param email The email of the account.
+     * @param password Password of the account.
+     * @param token Optional token. If it has changed, you can pass it in.
+     */
     constructor(email:string, password:string, token?:string) {
         this.email = email;
         this.password = password;
@@ -26,15 +30,6 @@ class Cronchy {
 
         this.main = "https://www.crunchyroll.com";
         this.api = "https://beta-api.crunchyroll.com";
-        
-        this.login = this.login.bind(this);
-        this.queryGenreData = this.queryGenreData.bind(this);
-        this.queryShowData = this.queryShowData.bind(this);
-        this.queryRatings = this.queryRatings.bind(this);
-        this.queryRecommendations = this.queryRecommendations.bind(this);
-        this.querySeason = this.querySeason.bind(this);
-        this.queryEpisodes = this.queryEpisodes.bind(this);
-        this.getEpisodes = this.getEpisodes.bind(this);
     }
 
     /**
@@ -329,7 +324,7 @@ class Cronchy {
      * @param episodeId The episode ID of the show.
      * @param locale The locale of the episode. For example, "en-US".
     */
-    public async getSources(episodeId:string, locale:string) {
+    public async getSources(episodeId:string, locale:string): Promise<Sources> {
         const temp_response = await axios.get(
             `${this.api}/content/v2/cms/objects/${episodeId}?locale=${locale}`,
             {
@@ -698,5 +693,22 @@ interface MediaType {
     "top_results"?: string;
 }
 
+interface Sources {
+    sources: Array<Source>;
+    subtitles: Array<Subtitle>;
+}
+
+interface Source {
+    url: string;
+    quality: string;
+    isM3U8: boolean;
+}
+
+interface Subtitle {
+    url: string;
+    lang: string;
+    format: string;
+}
+
 export default Cronchy;
-export type { AccountData, SearchData, SearchQuery, ShowData, ShowInfo, GenreQuery, GenreInfo, Localization, RatingsQuery, Rating, RecommendationsQuery, RecommendationsInfo, SeasonQuery, SeasonInfo, EpisodeQuery, EpisodeInfo, MediaType };
+export type { AccountData, SearchData, SearchQuery, ShowData, ShowInfo, GenreQuery, GenreInfo, Localization, RatingsQuery, Rating, RecommendationsQuery, RecommendationsInfo, SeasonQuery, SeasonInfo, EpisodeQuery, EpisodeInfo, MediaType, Sources, Subtitle, Show };
