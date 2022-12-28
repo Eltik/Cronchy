@@ -18,7 +18,6 @@ class Cronchy {
     private main:string;
     private api:string;
 
-    // If you are using Python 3, set this to true
     // For the token, it might change. You can pass it in if it has changed.
     constructor(email:string, password:string, token?:string) {
         this.email = email;
@@ -38,6 +37,9 @@ class Cronchy {
         this.getEpisodes = this.getEpisodes.bind(this);
     }
 
+    /**
+     * @important Must be run before any other function.
+    */
     public async login(): Promise<AccountData> {
         const response = await axios.post(`${this.api}/auth/v1/token`, {
             username: this.email,
@@ -104,6 +106,10 @@ class Cronchy {
         }
     }
 
+    /**
+     * @param query Search query. Takes a string.
+     * @param amount Max amount of search results. Takes a number.
+    */
     public async search(query:string, amount:number): Promise<SearchData> {
         const request = await axios.get(`${this.api}/content/v2/discover/search?q=${encodeURIComponent(query)}&n=${amount}&type=&locale=en-US`, {
             headers: {
@@ -199,8 +205,12 @@ class Cronchy {
         return episode_response["data"];
     }
 
-    public async getEpisodes(seriesQuery:SearchQuery, mediaType:MediaType, fetchAll: boolean) {
-        // https://www.crunchyroll.com/content/v2/cms/series/GXJHM39MP?locale=en-US
+    /**
+     * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+     * @param mediaType The type of media. Must be a valid Crunchyroll series string.
+     * @param fetchAll Whether or not to fetch all "seasons" (whatever Crunchyroll means by that lol). If false, only the the episodes from the "season" will be fetched.
+    */
+    public async getEpisodes(seriesQuery:SearchQuery, mediaType:MediaType, fetchAll: boolean): Promise<Show> {
         const id = seriesQuery.id;
         const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
         
@@ -282,7 +292,7 @@ class Cronchy {
             })
         }
 
-        const returnData = {
+        const returnData:Show = {
             id: id,
             title: cr_data.data[0].title,
             isAdult: cr_data.data[0].title,
@@ -315,6 +325,10 @@ class Cronchy {
         return returnData;
     }
 
+    /**
+     * @param episodeId The episode ID of the show.
+     * @param locale The locale of the episode. For example, "en-US".
+    */
     public async getSources(episodeId:string, locale:string) {
         const temp_response = await axios.get(
             `${this.api}/content/v2/cms/objects/${episodeId}?locale=${locale}`,
@@ -410,8 +424,14 @@ interface AccountData {
 
 interface SearchData {
     total: number;
-    data: Array<JSON>;
+    data: Array<SearchResult>;
     meta: JSON;
+}
+
+interface SearchResult {
+    type: MediaType["top_results"] | MediaType["series"] | MediaType["movie_listing"] | MediaType["episode"];
+    count: number;
+    items: Array<SearchQuery>;
 }
 
 interface SearchQuery {
@@ -436,6 +456,23 @@ interface ShowData {
     total: number;
     data: Array<ShowInfo>;
     meta: JSON;
+}
+
+interface Show {
+    id: string;
+    title: string;
+    isAdult: string|boolean;
+    image: string;
+    cover: string;
+    description: string;
+    releaseDate: number;
+    genres: string[];
+    season: string;
+    hasDub: boolean;
+    hasSub: boolean;
+    rating: string;
+    recommendations: any;
+    episodes: any;
 }
 
 interface ShowInfo {
@@ -658,6 +695,7 @@ interface MediaType {
     "objects"?: string;
     "movie_listing"?: string;
     "episode"?: string;
+    "top_results"?: string;
 }
 
 export default Cronchy;

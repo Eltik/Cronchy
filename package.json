@@ -1,8 +1,8 @@
 {
   "name": "cronchy",
   "version": "0.0.1",
-  "description": "Crunchyroll package for https://crunchyroll.com.",
-  "main": "./src/Cronchy",
+  "description": "Crunchyroll scraper for https://crunchyroll.com.",
+  "main": "./built/Cronchy",
   "scripts": {
     "install": "npm install",
     "build": "tsc --build",
@@ -20,7 +20,6 @@
     "axios": "^1.2.1"
   },
   "devDependencies": {
-    "@types/node": "^18.11.17",
-    "jsdom": "^20.0.3"
+    "@types/node": "^18.11.17"
   }
 }
