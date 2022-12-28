@@ -4,7 +4,9 @@
   "description": "Crunchyroll package for https://crunchyroll.com.",
   "main": "./src/Cronchy",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install": "npm install",
+    "build": "tsc --build",
+    "clean": "tsc --build --clean"
   },
   "keywords": [
     "crunchyroll",

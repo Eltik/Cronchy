@@ -39,18 +39,19 @@ class Cronchy {
     }
 
     public async login(): Promise<AccountData> {
-        const response = await axios.post(`${this.api}/auth/v1/token`,
-            {
-                username: this.email,
-                password: this.password,
-                grant_type: "password",
-                scope: "offline_access"
-            },
+        const response = await axios.post(`${this.api}/auth/v1/token`, {
+            username: this.email,
+            password: this.password,
+            grant_type: "password",
+            scope: "offline_access"
+        },
             {
             headers: {
                 Authorization: `Basic ${this.token}`,
                 "Content-Type": "application/x-www-form-urlencoded"
             }
+        }).catch((err) => {
+            throw new Error(`Request to ${this.api}/auth/v1/token failed.\nEmail: ${this.email}; Password: ${this.password}; Token: ${this.token}`);
         });
 
         const data = {
@@ -73,7 +74,9 @@ class Cronchy {
                     Authorization: "Bearer " + data.access_token,
                 },
             }
-        );
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/index/v2 failed.\nBearer: ${data.access_token}`);
+        });
 
         const sig_data = {
             signature: signature.data ? signature.data.cms.signature : "",
@@ -107,6 +110,8 @@ class Cronchy {
                 Authorization: `Bearer ${this.accessToken}`,
                 Referer: this.main
             }
+        }).catch((err) => {
+            throw new Error(`Request to ${this.api}/content/v2/discover/search?q=${encodeURIComponent(query)}&n=${amount}&type=&locale=en-US failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
         });
         return request.data;
     }
@@ -117,6 +122,8 @@ class Cronchy {
                 Authorization: `Bearer ${this.accessToken}`,
                 Referer: this.main
             }
+        }).catch((err) => {
+            throw new Error(`Request to ${this.api}/content/v2/cms/${mediaType}/${id}?locale=${locale} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
         });
 
         return cr_data["data"];
@@ -124,7 +131,7 @@ class Cronchy {
 
     public async queryGenreData(id:string, locale:string): Promise<GenreQuery> {
         const cr_genre_response: GenreQuery = await axios.get(
-            `https://beta-api.crunchyroll.com/content/v1/tenant_categories?guid=${id}?locale=${locale}`,
+            `${this.api}/content/v1/tenant_categories?guid=${id}?locale=${locale}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.accessToken}`,
@@ -137,50 +144,58 @@ class Cronchy {
 
     public async queryRatings(id:string): Promise<RatingsQuery> {
         const cr_ratings_response = await axios.get(
-            `https://beta-api.crunchyroll.com/content-reviews/v2/user/${this.accountId}/rating/series/${id}`,
+            `${this.api}/content-reviews/v2/user/${this.accountId}/rating/series/${id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.accessToken}`,
                 },
             }
-        );
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/content-reviews/v2/user/${this.accountId}/rating/series/${id} failed.\nBearer: ${this.accessToken}`);
+        });
         return cr_ratings_response["data"];
     }
 
     public async queryRecommendations(id:string, locale:string): Promise<RecommendationsQuery> {
         const cr_recommendations_response = await axios.get(
-            `https://beta-api.crunchyroll.com/content/v1/${this.accountId}/similar_to?guid=${id}&locale=${locale}&n=30`,
+            `${this.api}/content/v1/${this.accountId}/similar_to?guid=${id}&locale=${locale}&n=30`,
             {
                 headers: {
                     Authorization: `Bearer ${this.accessToken}`,
                 },
             }
-        );
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/content/v1/${this.accountId}/similar_to?guid=${id}&locale=${locale}&n=30 failed.\nBearer: ${this.accessToken}`);
+        });
         return cr_recommendations_response["data"];
     }
 
     public async querySeason(id:string, locale:string): Promise<SeasonQuery> {
         const season_response = await axios.get(
-            `https://beta-api.crunchyroll.com/cms/v2${this.bucket}/seasons?series_id=${id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`,
+            `${this.api}/cms/v2${this.bucket}/seasons?series_id=${id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`,
             {
                 headers: {
                     Authorization: "Bearer " + this.accessToken,
                 },
             }
-        );
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/cms/v2${this.bucket}/seasons?series_id=${id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id} failed.\nBearer: ${this.accessToken}`);
+        });
         return season_response["data"];
     }
 
     public async queryEpisodes(season:SeasonInfo, locale:string): Promise<EpisodeQuery> {
         const episode_response = await axios.get(
-            `https://beta-api.crunchyroll.com/cms/v2${this.bucket}/episodes?season_id=${season.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`,
+            `${this.api}/cms/v2${this.bucket}/episodes?season_id=${season.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`,
             {
                 headers: {
                     Authorization: `Bearer ${this.accessToken}`,
                     Referer: this.main,
                 },
             }
-        );
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/cms/v2${this.bucket}/episodes?season_id=${season.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
+        });
         return episode_response["data"];
     }
 
@@ -298,6 +313,84 @@ class Cronchy {
         };
     
         return returnData;
+    }
+
+    public async getSources(episodeId:string, locale:string) {
+        const temp_response = await axios.get(
+            `${this.api}/content/v2/cms/objects/${episodeId}?locale=${locale}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                    Referer: this.main,
+                },
+            }
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}/content/v2/cms/objects/${episodeId}?locale=${locale} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
+        });
+
+        const temp_data = await temp_response.data.data[0];
+    
+        const episode_response = await axios.get(
+            `${this.api}${temp_data.streams_link}?locale=${locale}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${this.accessToken}`,
+                    Referer: this.main,
+                },
+            }
+        ).catch((err) => {
+            throw new Error(`Request to ${this.api}${temp_data.streams_link}?locale=${locale} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
+        });
+
+        const episode_data = await episode_response.data;
+
+        const sources = [];
+
+        const m3u8Urls = await axios.get(episode_data.data[0].vo_adaptive_hls[""].url,
+            {
+                headers: {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+                    Referer: this.main,
+                },
+            }
+        ).catch((err) => {
+            throw new Error(`Request to ${episode_data.data[0].vo_adaptive_hls[""].url}; User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"; Referer: ${this.main}`);
+        });
+
+        const videoList = m3u8Urls.data.split("#EXT-X-STREAM-INF:");
+
+        for (const video of videoList ?? []) {
+            if (!video.includes("m3u8")) continue;
+
+            const url = video.split("\n")[1];
+            const quality = video.split("RESOLUTION=")[1].split(",")[0].split("x")[1];
+
+            sources.push({
+                url: url,
+                quality: `${quality}p`,
+                isM3U8: true,
+            });
+        }
+
+        sources.push({
+            quality: "auto",
+            url: episode_data.data[0].vo_adaptive_hls[""].url,
+            isM3U8: true,
+        });
+
+        let subtitles: any[] = [];
+        for (var key of Object.keys(episode_data.meta.subtitles)) {
+            subtitles.push({
+                url: episode_data.meta.subtitles[key].url,
+                lang: key,
+                format: episode_data.meta.subtitles[key].format,
+            });
+        }
+
+        return {
+            sources: sources,
+            subtitles: subtitles,
+        };
     }
 }
 
