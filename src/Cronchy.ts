@@ -283,39 +283,47 @@ class Cronchy {
         const episodes: {}[] = [];
         
         if (fetchAll) {
-            season_list.map((async(season: SeasonInfo) => {
-                const episode_response = await this.queryEpisodes(season, locale);
-                const episode_data = await episode_response.items;
-
-                const season_episode_list = {
-                    [season.type]: [
-                        await episode_data.map((episode: EpisodeInfo) => {
-                            return {
-                                id: episode.id,
-                                season_number: season.season_number,
-                                title: episode.title,
-                                image:
-                                    episode.images.thumbnail[0][
-                                    episode.images.thumbnail[0].length - 1
-                                    ].source,
-                                description: episode.description,
-                                releaseDate: episode.episode_air_date,
-                                isHD: episode.hd_flag,
-                                isAdult: episode.is_mature,
-                                isDubbed: episode.is_dubbed,
-                                isSubbed: episode.is_subbed,
-                                duration: episode.duration,
-                            };
-                        }),
-                    ],
-                };
-                return season_episode_list;
+            const promises = [];
+            season_list.map(((season: SeasonInfo) => {
+                const promise = new Promise(async(resolve, reject) => {
+                    const episode_response = await this.queryEpisodes(season, locale);
+                    const episode_data = await episode_response.items;
+    
+                    const season_episode_list = {
+                        [season.type]: [
+                            episode_data.map((episode: EpisodeInfo) => {
+                                return {
+                                    id: episode.id,
+                                    season_number: season.season_number,
+                                    title: episode.title,
+                                    image:
+                                        episode.images.thumbnail[0][
+                                        episode.images.thumbnail[0].length - 1
+                                        ].source,
+                                    description: episode.description,
+                                    releaseDate: episode.episode_air_date,
+                                    isHD: episode.hd_flag,
+                                    isAdult: episode.is_mature,
+                                    isDubbed: episode.is_dubbed,
+                                    isSubbed: episode.is_subbed,
+                                    duration: episode.duration,
+                                };
+                            }),
+                        ],
+                    };
+                    episodes.push(season_episode_list);
+                    resolve(season_episode_list);
+                })
+                promises.push(promise);
+                return promise;
             }))
+
+            await Promise.all(promises);
         } else {
             const season = season_list[0];
             const episode_response = await this.queryEpisodes(season, locale);
             const episode_data = await episode_response.items;
-            await episode_data.map((episode: EpisodeInfo) => {
+            episode_data.map((episode: EpisodeInfo) => {
                 return {
                     id: episode.id,
                     season_number: season.season_number,
@@ -330,6 +338,8 @@ class Cronchy {
                     duration: episode.duration,
                 };
             })
+
+            episodes.push(...episode_data)
         }
 
         const returnData:Show = {
