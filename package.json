@@ -1,10 +1,13 @@
 {
   "name": "cronchy",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Crunchyroll scraper for https://crunchyroll.com.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eltik/Cronchy.git"
+  },
   "main": "./built/Cronchy",
   "scripts": {
-    "install": "npm install",
     "build": "tsc --build",
     "clean": "tsc --build --clean"
   },
