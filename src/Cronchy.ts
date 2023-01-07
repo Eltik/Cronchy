@@ -120,7 +120,8 @@ class Cronchy {
      * @param query Search query. Takes a string.
      * @param amount Max amount of search results. Takes a number.
     */
-    public async search(query:string, amount:number): Promise<SearchData> {
+    public async search(query:string, amount?:number): Promise<SearchData> {
+        amount = amount ? amount : 8;
         const req = new PromiseRequest(`${this.api}/content/v2/discover/search?q=${encodeURIComponent(query)}&n=${amount}&type=&locale=en-US`, {
             headers: {
                 Authorization: `Bearer ${this.accessToken}`,
@@ -230,13 +231,29 @@ class Cronchy {
 
     /**
      * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+     * @returns 
+     */
+    public getLocaleFromSearchQuery(seriesQuery:SearchQuery): string {
+        const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
+        return locale;
+    }
+
+    /**
+     * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+     * @returns 
+     */
+    public getMediaTypeFromSearchQuery(seriesQuery:SearchQuery):MediaType["episode"]|MediaType["movie_listing"]|MediaType["objects"]|MediaType["series"]|MediaType["top_results"] {
+        const type = seriesQuery.type;
+        return type;
+    }
+
+    /**
+     * @param id SearchQuery id. Can be obtained from the search function.
+     * @param locale The locale of the show. Can be obtained from the search function or via getLocaleFromSearchQuery().
      * @param mediaType The type of media. Must be a valid Crunchyroll series string.
      * @param fetchAll Whether or not to fetch all "seasons" (whatever Crunchyroll means by that lol). If false, only the the episodes from the "season" will be fetched.
     */
-    public async getEpisodes(seriesQuery:SearchQuery, mediaType:MediaType, fetchAll: boolean): Promise<Show> {
-        const id = seriesQuery.id;
-        const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
-        
+    public async getEpisodes(id:SearchQuery["id"], locale:string, mediaType:MediaType, fetchAll: boolean): Promise<Show> {
         const cr_data = await this.queryShowData(id, locale, mediaType);
         const cr_genre_response = await this.queryGenreData(id, locale);
         const cr_ratings_data = await this.queryRatings(id);

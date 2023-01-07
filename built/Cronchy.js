@@ -92,6 +92,7 @@ class Cronchy {
      * @param amount Max amount of search results. Takes a number.
     */
     async search(query, amount) {
+        amount = amount ? amount : 8;
         const req = new promise_request_1.default(`${this.api}/content/v2/discover/search?q=${encodeURIComponent(query)}&n=${amount}&type=&locale=en-US`, {
             headers: {
                 Authorization: `Bearer ${this.accessToken}`,
@@ -180,12 +181,27 @@ class Cronchy {
     }
     /**
      * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+     * @returns
+     */
+    getLocaleFromSearchQuery(seriesQuery) {
+        const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
+        return locale;
+    }
+    /**
+     * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+     * @returns
+     */
+    getMediaTypeFromSearchQuery(seriesQuery) {
+        const type = seriesQuery.type;
+        return type;
+    }
+    /**
+     * @param id SearchQuery id. Can be obtained from the search function.
+     * @param locale The locale of the show. Can be obtained from the search function or via getLocaleFromSearchQuery().
      * @param mediaType The type of media. Must be a valid Crunchyroll series string.
      * @param fetchAll Whether or not to fetch all "seasons" (whatever Crunchyroll means by that lol). If false, only the the episodes from the "season" will be fetched.
     */
-    async getEpisodes(seriesQuery, mediaType, fetchAll) {
-        const id = seriesQuery.id;
-        const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
+    async getEpisodes(id, locale, mediaType, fetchAll) {
         const cr_data = await this.queryShowData(id, locale, mediaType);
         const cr_genre_response = await this.queryGenreData(id, locale);
         const cr_ratings_data = await this.queryRatings(id);

@@ -71,7 +71,7 @@ fastify.listen({ port: 3000 }, (err, address) => {
 ```
 
 ### Searching
-Searching using the Cronchy package is simple. Just run `instance.search(query, amount);` to search through all of Crunchyroll for a specific show.
+Searching using the Cronchy package is simple. Just run `instance.search(query, amount?);` to search through all of Crunchyroll for a specific show. `amount` is an optional parameter that by default will input 8 if not specified.
 ```typescript
 const instance = new Cronchy(...);
 /**
@@ -95,17 +95,19 @@ interface SearchResult {
 ```
 
 ### Getting Episodes
-Fetching episodes requires a `SearchQuery` object. This can be obtained from searching like above. Next, you can run the `getEpisodes()` function.
+Fetchin episodes requires the ID of the show. In past versions of Cronchy you were required to input a `SearchQuery` object. However, I realized that Crunchyroll actually fetches the show info based on the show ID so I removed that parameter. `getEpisodes()` also requires the locale of the show, but most of the time it's just `en-US`. If you need to confirm the locale of the show you are querying, you can run the `getLocaleFromSearchQuery()` function and input a `SearchQuery` object. Lastly, the `mediaType` parameter is the type of the show as the name suggests. You can run the `getMediaTypeFromSearchQuery()` function and input a `SearchQuery` object to fetch it. If either the locale or media type return `undefined`, it most likely means that the show has not been released officially on Crunchyroll (eg. it's not available yet).
 ```typescript
 const instance = new Cronchy(...);
 /**
- * @param seriesQuery SearchQuery object. Can be obtained from the search function.
+ * @param id SearchQuery id. Can be obtained from the search function.
+ * @param locale The locale of the show. Can be obtained from the search function or via getLocaleFromSearchQuery().
  * @param mediaType The type of media. Must be a valid Crunchyroll series string.
  * @param fetchAll Whether or not to fetch all "seasons" (whatever Crunchyroll means by that lol). If false, only the the episodes from the "season" will be fetched.
- * returns Promise<Show>
 */
 const results = await instance.search(...);
-await instance.getEpisodes(results.data[0].items[0], results.data[0].items[0].type, false);
+const locale = instance.getLocaleFromSearchQuery(result.data[0].items[0]);
+const mediaType = instance.getMediaTypeFromSearchQuery(result.data[0].items[0]);
+await instance.getEpisodes(results.data[0].items[0].id, locale, mediaType, false);
 
 interface Show {
     id: string;
