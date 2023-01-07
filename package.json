@@ -1,6 +1,6 @@
 {
   "name": "cronchy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Crunchyroll scraper for https://crunchyroll.com.",
   "repository": {
     "type": "git",
