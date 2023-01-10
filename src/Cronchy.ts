@@ -315,7 +315,6 @@ class Cronchy {
                     resolve(season_episode_list);
                 })
                 promises.push(promise);
-                return promise;
             }))
 
             await Promise.all(promises);
