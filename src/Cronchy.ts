@@ -262,7 +262,7 @@ class Cronchy {
 
         const cr_genre_data = cr_genre_response.items;
         const genres: string[] = [];
-        cr_genre_data.forEach((genre: GenreInfo) => {
+        cr_genre_data?.forEach((genre: GenreInfo) => {
             genres.push(genre.localization.title);
         });
 

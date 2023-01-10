@@ -209,7 +209,7 @@ class Cronchy {
         const season_response = await this.querySeason(id, locale);
         const cr_genre_data = cr_genre_response.items;
         const genres = [];
-        cr_genre_data.forEach((genre) => {
+        cr_genre_data?.forEach((genre) => {
             genres.push(genre.localization.title);
         });
         const season_data = season_response.items;
