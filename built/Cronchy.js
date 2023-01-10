@@ -168,14 +168,14 @@ class Cronchy {
         return seasons_response.json();
     }
     async queryEpisodes(season, locale) {
-        const req = new promise_request_1.default(`${this.api}/cms/v2${this.bucket}/episodes?season_id=${season.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`, {
+        const req = new promise_request_1.default(`${this.api}/cms/v2${this.bucket}/episodes?season_id=${season?.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id}`, {
             headers: {
                 Authorization: `Bearer ${this.accessToken}`,
                 Referer: this.main
             },
         });
         const episode_response = await req.request().catch((err) => {
-            throw new Error(`Request to ${this.api}/cms/v2${this.bucket}/episodes?season_id=${season.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
+            throw new Error(`Request to ${this.api}/cms/v2${this.bucket}/episodes?season_id=${season?.id}&locale=${locale}&Signature=${this.signature}&Policy=${this.policy}&Key-Pair-Id=${this.key_pair_id} failed.\nBearer: ${this.accessToken}; Referer: ${this.main}`);
         });
         return episode_response.json();
     }
@@ -214,7 +214,7 @@ class Cronchy {
         });
         const season_data = season_response.items;
         let season_list = [];
-        season_data.forEach((season) => {
+        season_data?.forEach((season) => {
             season_list.push({
                 id: season.id,
                 title: season.title,
@@ -262,7 +262,7 @@ class Cronchy {
             const season = season_list[0];
             const episode_response = await this.queryEpisodes(season, locale);
             const episode_data = await episode_response.items;
-            episode_data.map((episode) => {
+            episode_data?.map((episode) => {
                 return {
                     id: episode.id,
                     season_number: season.season_number,
@@ -277,37 +277,73 @@ class Cronchy {
                     duration: episode.duration,
                 };
             });
-            episodes.push(...episode_data);
+            if (episode_data != undefined) {
+                episodes?.push(...episode_data);
+            }
         }
-        const returnData = {
-            id: id,
-            title: cr_data.data[0].title,
-            isAdult: cr_data.data[0].title,
-            image: cr_data.data[0].images.poster_tall[0][cr_data.data[0].images.poster_tall[0].length - 1].source,
-            cover: cr_data.data[0].images.poster_wide[0][cr_data.data[0].images.poster_wide[0].length - 1].source,
-            description: cr_data.data[0].description,
-            releaseDate: cr_data.data[0].series_launch_year,
-            genres: genres,
-            season: cr_data.data[0].season_tags[0].split("-")[0],
-            hasDub: cr_data.data[0].is_dubbed,
-            hasSub: cr_data.data[0].is_subbed,
-            rating: cr_ratings_data.average,
-            recommendations: cr_recommendations_data.map((rec) => {
-                return {
-                    id: id,
-                    title: rec.title,
-                    isAdult: rec.is_mature,
-                    image: rec.images.poster_tall[0][rec.images.poster_tall[0].length - 1].source,
-                    popularity: 0,
-                    cover: rec.images.poster_wide[0][rec.images.poster_wide[0].length - 1].source,
-                    description: rec.description,
-                    releaseDate: rec.series_launch_year,
-                    hasDub: rec.is_dubbed,
-                    hasSub: rec.is_subbed,
-                };
-            }),
-            episodes: episodes,
-        };
+        let returnData;
+        if (cr_data?.data) {
+            returnData = {
+                id: id,
+                title: cr_data?.data[0]?.title,
+                isAdult: cr_data?.data[0]?.title,
+                image: cr_data?.data[0]?.images.poster_tall[0][cr_data?.data[0].images.poster_tall[0].length - 1].source,
+                cover: cr_data?.data[0]?.images.poster_wide[0][cr_data?.data[0].images.poster_wide[0].length - 1].source,
+                description: cr_data?.data[0]?.description,
+                releaseDate: cr_data?.data[0]?.series_launch_year,
+                genres: genres,
+                season: cr_data?.data[0]?.season_tags[0].split("-")[0],
+                hasDub: cr_data?.data[0]?.is_dubbed,
+                hasSub: cr_data?.data[0]?.is_subbed,
+                rating: cr_ratings_data?.average,
+                recommendations: cr_recommendations_data?.map((rec) => {
+                    return {
+                        id: id,
+                        title: rec.title,
+                        isAdult: rec.is_mature,
+                        image: rec.images.poster_tall[0][rec.images.poster_tall[0].length - 1].source,
+                        popularity: 0,
+                        cover: rec.images.poster_wide[0][rec.images.poster_wide[0].length - 1].source,
+                        description: rec.description,
+                        releaseDate: rec.series_launch_year,
+                        hasDub: rec.is_dubbed,
+                        hasSub: rec.is_subbed,
+                    };
+                }),
+                episodes: episodes,
+            };
+        }
+        else {
+            returnData = {
+                id: id,
+                title: "undefined",
+                isAdult: "undefined",
+                image: "undefined",
+                cover: "undefined",
+                description: "undefined",
+                releaseDate: -1,
+                genres: [],
+                season: "undefined",
+                hasDub: false,
+                hasSub: false,
+                rating: cr_ratings_data?.average,
+                recommendations: cr_recommendations_data?.map((rec) => {
+                    return {
+                        id: id,
+                        title: rec.title,
+                        isAdult: rec.is_mature,
+                        image: rec.images.poster_tall[0][rec.images.poster_tall[0].length - 1].source,
+                        popularity: 0,
+                        cover: rec.images.poster_wide[0][rec.images.poster_wide[0].length - 1].source,
+                        description: rec.description,
+                        releaseDate: rec.series_launch_year,
+                        hasDub: rec.is_dubbed,
+                        hasSub: rec.is_subbed,
+                    };
+                }),
+                episodes: episodes,
+            };
+        }
         return returnData;
     }
     /**
