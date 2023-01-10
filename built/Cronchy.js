@@ -184,7 +184,7 @@ class Cronchy {
      * @returns
      */
     getLocaleFromSearchQuery(seriesQuery) {
-        const locale = seriesQuery && seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery?.series_metadata["audio_locales"][0];
+        const locale = seriesQuery.series_metadata["subtitle_locales"].length > 0 ? seriesQuery.series_metadata["subtitle_locales"][0] : seriesQuery.series_metadata["audio_locales"][0];
         return locale;
     }
     /**
