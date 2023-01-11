@@ -26,7 +26,7 @@ class Cronchy {
         params.append("grant_type", "password");
         params.append("scope", "offline_access");
         const req = new promise_request_1.default(`${this.api}/auth/v1/token`, {
-            body: params,
+            data: params,
             headers: {
                 Authorization: `Basic ${this.token}`,
                 "Content-Type": "application/x-www-form-urlencoded"

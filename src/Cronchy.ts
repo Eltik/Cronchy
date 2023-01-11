@@ -43,7 +43,7 @@ class Cronchy {
         params.append("scope", "offline_access");
 
         const req = new PromiseRequest(`${this.api}/auth/v1/token`, {
-            body: params,
+            data: params,
             headers: {
                 Authorization: `Basic ${this.token}`,
                 "Content-Type": "application/x-www-form-urlencoded"
