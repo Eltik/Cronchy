@@ -34,7 +34,7 @@ export default class PromiseRequest {
                             redirectUrl = this.url;
                         }
 
-                        const text = JSON.stringify(response.data);
+                        const text = response.data;
                         let json = response.data;
                         try {
                             json = JSON.parse(response.data);
